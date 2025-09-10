@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fest Events Display</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+
+        .header-controls {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .event-card {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .event-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .event-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .event-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .event-details {
+            margin-bottom: 15px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 5px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .detail-value {
+            color: #333;
+        }
+
+        .prize-section {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .prize-title {
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .prizes {
+            display: flex;
+            justify-content: space-between;
+            text-align: center;
+        }
+
+        .prize-item {
+            flex: 1;
+        }
+
+        .prize-label {
+            font-size: 12px;
+            color: #856404;
+            font-weight: 600;
+        }
+
+        .prize-amount {
+            font-size: 16px;
+            font-weight: bold;
+            color: #d63384;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 18px;
+        }
+
+        .no-events {
+            text-align: center;
+            padding: 60px;
+            color: #666;
+            font-size: 18px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px dashed #dee2e6;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .event-type-badge {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .events-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .prizes {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 Fest Events</h1>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-number" id="totalEvents">0</div>
+                <div class="stat-label">Total Events</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="totalPrize">₹0</div>
+                <div class="stat-label">Total Prize Money</div>
+            </div>
+        </div>
+
+        <div class="header-controls">
+            <button class="btn btn-primary" onclick="loadEvents()">🔄 Refresh Events</button>
+        </div>
+
+        <div id="messageArea"></div>
+
+        <!-- Events Display -->
+        <div id="eventsContainer">
+            <div class="loading">Loading events...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadEvents();
+            
+            // Auto-refresh every 30 seconds to show backend changes
+            setInterval(loadEvents, 30000);
+        });
+
+        // Load all events from API
+        async function loadEvents() {
+            const container = document.getElementById('eventsContainer');
+            
+            try {
+                const response = await fetch(`${API_BASE}/events`);
+                const data = await response.json();
+
+                if (data.success) {
+                    displayEvents(data.data);
+                    updateStats(data.data);
+                    showMessage('Events loaded successfully! ✅', 'success');
+                    
+                    // Clear success message after 3 seconds
+                    setTimeout(() => {
+                        document.getElementById('messageArea').innerHTML = '';
+                    }, 3000);
+                } else {
+                    showMessage('Failed to load events from API', 'error');
+                    container.innerHTML = '<div class="no-events">Failed to load events</div>';
+                }
+            } catch (error) {
+                showMessage('Error: Cannot connect to API server. Make sure it\'s running on port 3000.', 'error');
+                container.innerHTML = `
+                    <div class="no-events">
+                        <h3>Cannot connect to server</h3>
+                        <p>Please make sure your API server is running on <strong>http://localhost:3000</strong></p>
+                        <p>Run: <code>npm run dev</code> in your API directory</p>
+                    </div>
+                `;
+                console.error('Load events error:', error);
+            }
+        }
+
+        // Display events in cards
+        function displayEvents(events) {
+            const container = document.getElementById('eventsContainer');
+
+            if (events.length === 0) {
+                container.innerHTML = `
+                    <div class="no-events">
+                        <h3>No Events Found</h3>
+                        <p>Use your API (Postman) to create events and they will appear here!</p>
+                        <p>POST to: <strong>http://localhost:3000/api/events</strong></p>
+                    </div>
+                `;
+                return;
+            }
+
+            const eventsHTML = events.map(event => `
+                <div class="event-card">
+                    <div class="event-type-badge">${event.eventType}</div>
+                    <h3 class="event-title">${event.title}</h3>
+                    <p class="event-description">${event.description}</p>
+                    
+                    <div class="event-details">
+                        <div class="detail-row">
+                            <span class="detail-label">📅 Date & Time:</span>
+                            <span class="detail-value">${formatDateTime(event.dateTime)}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">📍 Venue:</span>
+                            <span class="detail-value">${event.venue}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">👥 Max Team Size:</span>
+                            <span class="detail-value">${event.maxTeamSize} ${event.maxTeamSize === 1 ? 'person' : 'people'}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">🆔 Event ID:</span>
+                            <span class="detail-value">#${event.id}</span>
+                        </div>
+                    </div>
+
+                    <div class="prize-section">
+                        <div class="prize-title">🏆 Prize Money</div>
+                        <div class="prizes">
+                            <div class="prize-item">
+                                <div class="prize-label">1st Place</div>
+                                <div class="prize-amount">₹${event.prizeMoney.first.toLocaleString()}</div>
+                            </div>
+                            <div class="prize-item">
+                                <div class="prize-label">2nd Place</div>
+                                <div class="prize-amount">₹${event.prizeMoney.second.toLocaleString()}</div>
+                            </div>
+                            <div class="prize-item">
+                                <div class="prize-label">3rd Place</div>
+                                <div class="prize-amount">₹${event.prizeMoney.third.toLocaleString()}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = `<div class="events-grid">${eventsHTML}</div>`;
+        }
+
+        // Update statistics
+        function updateStats(events) {
+            const totalEvents = events.length;
+            const totalPrize = events.reduce((sum, event) => 
+                sum + event.prizeMoney.first + event.prizeMoney.second + event.prizeMoney.third, 0
+            );
+
+            document.getElementById('totalEvents').textContent = totalEvents;
+            document.getElementById('totalPrize').textContent = `₹${totalPrize.toLocaleString()}`;
+        }
+
+        // Show message to user
+        function showMessage(message, type) {
+            const messageArea = document.getElementById('messageArea');
+            messageArea.innerHTML = `<div class="message ${type}">${message}</div>`;
+        }
+
+        // Format date and time for display
+        function formatDateTime(dateString) {
+            const date = new Date(dateString);
+            const options = {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            };
+            return date.toLocaleDateString('en-IN', options);
+        }
+
+        // Log for debugging
+        console.log('Frontend loaded. API Base URL:', API_BASE);
+        console.log('Events will auto-refresh every 30 seconds to show backend changes.');
+    </script>
+</body>
+</html>
